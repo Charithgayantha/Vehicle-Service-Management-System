@@ -17,3 +17,4 @@ declare module '@inertiajs/core' {
         };
     }
 }
+declare const route: any;

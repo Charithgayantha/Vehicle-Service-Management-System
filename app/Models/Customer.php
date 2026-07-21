@@ -4,20 +4,29 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Customer extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'email', 'phone', 'address'];
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'name',
+        'email',
+        'phone',
+        'address',
+    ];
 
-    public function vehicles()
+    /**
+     * Get all of the vehicles for the customer.
+     */
+    public function vehicles(): HasMany
     {
         return $this->hasMany(Vehicle::class);
-    }
-
-    public function jobCards()
-    {
-        return $this->hasMany(JobCard::class);
     }
 }
