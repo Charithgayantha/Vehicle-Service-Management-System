@@ -7,18 +7,29 @@ use App\Http\Controllers\JobCardController;
 use App\Http\Controllers\MechanicController;
 use App\Http\Controllers\PartController;
 use App\Http\Controllers\VehicleController;
+use App\Http\Controllers\AiServiceSummaryController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+// Home route
 Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
 
+// Authenticated Routes
 Route::middleware(['auth', 'verified'])->group(function () {
+    // Dashboard
     Route::get('dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
 
-    // Vehicle Service Management Routes
+    // AI Service Summary Page & API Endpoint
+    Route::get('/AiServiceSummary', function () {
+        return Inertia::render('AiServiceSummary');
+    })->name('ai.service.summary');
+
+    Route::post('/api/generate-summary', [AiServiceSummaryController::class, 'generate']);
+
+    // Vehicle Service Management Resource Routes
     Route::resource('customers', CustomerController::class);
     Route::resource('vehicles', VehicleController::class);
     Route::resource('mechanics', MechanicController::class);
