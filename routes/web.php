@@ -1,23 +1,22 @@
 <?php
 
 use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\VehicleController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\JobCardController;
 use App\Http\Controllers\MechanicController;
 use App\Http\Controllers\PartController;
-use App\Http\Controllers\JobCardController;
+use App\Http\Controllers\VehicleController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use App\Http\Controllers\InvoiceController;
-
 
 Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard');
 
     // Vehicle Service Management Routes
     Route::resource('customers', CustomerController::class);
