@@ -1,113 +1,110 @@
-import React from 'react';
-import { Head, Link, router } from '@inertiajs/react';
-import { create, destroy, edit } from '@/routes/vehicles';
-
-interface Customer {
-    id: number;
-    name: string;
-    phone?: string;
-}
+import React from "react";
+import { Head, Link, router } from "@inertiajs/react";
+import AppLayout from "@/layouts/app-layout";
 
 interface Vehicle {
     id: number;
-    customer_id: number;
-    make: string;
-    model: string;
-    year: number;
     license_plate: string;
-    vin?: string;
+    model: string;
     color?: string;
-    customer?: Customer;
+    vin?: string;
+    customer?: {
+        name: string;
+        phone: string;
+    };
 }
 
-interface Props {
-    vehicles: Vehicle[];
+interface VehiclesIndexProps {
+    vehicles: Vehicle[] | { data: Vehicle[] };
 }
 
-export default function Index({ vehicles }: Props) {
+export default function VehiclesIndex({ vehicles }: VehiclesIndexProps) {
+    const vehicleList = Array.isArray(vehicles) ? vehicles : (vehicles?.data || []);
+
     const handleDelete = (id: number, plate: string) => {
-        if (confirm(`Are you sure you want to delete vehicle (${plate})?`)) {
-            router.delete(destroy(id).url);
+        if (window.confirm(`Are you sure you want to delete vehicle with license plate "${plate}"?`)) {
+            router.delete(`/vehicles/${id}`);
         }
     };
 
     return (
-        <div className="py-12 max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <Head title="Vehicles" />
+        <AppLayout>
+            <Head title="Vehicles Management" />
 
-            <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+            <div className="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                {/* Header Section */}
                 <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-bold text-gray-800">Vehicles Management</h1>
+                    <div>
+                        <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Vehicles Management</h1>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Manage registered customer vehicles and specifications.</p>
+                    </div>
                     <Link
-                        href={create().url}
-                        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-150"
+                        href="/vehicles/create"
+                        className="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150"
                     >
                         + Register New Vehicle
                     </Link>
                 </div>
 
-                <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">License Plate</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vehicle</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Owner (Customer)</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Color / VIN</th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {vehicles.length === 0 ? (
+                {/* Table Section */}
+                <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg border border-gray-200 dark:border-gray-700">
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <thead className="bg-gray-50 dark:bg-gray-700/50">
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
-                                        No vehicles registered yet.
-                                    </td>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">License Plate</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Vehicle</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Owner (Customer)</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Color / VIN</th>
+                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
                                 </tr>
-                            ) : (
-                                vehicles.map((vehicle) => (
-                                    <tr key={vehicle.id} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 whitespace-nowrap font-bold text-gray-900">
-                                            {vehicle.license_plate}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-gray-700">
-                                            {vehicle.year} {vehicle.make} {vehicle.model}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-gray-700">
-                                            {vehicle.customer ? (
-                                                <div>
-                                                    <div className="font-medium text-gray-900">{vehicle.customer.name}</div>
-                                                    <div className="text-xs text-gray-500">{vehicle.customer.phone || 'No phone'}</div>
-                                                </div>
-                                            ) : (
-                                                <span className="text-red-500 italic">Unassigned</span>
-                                            )}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            <div>{vehicle.color || 'N/A'}</div>
-                                            <div className="text-xs text-gray-400 font-mono">{vehicle.vin || 'No VIN'}</div>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
-                                            <Link
-                                                href={edit(vehicle.id).url}
-                                                className="text-indigo-600 hover:text-indigo-900 font-semibold"
-                                            >
-                                                Edit
-                                            </Link>
-                                            <button
-                                                onClick={() => handleDelete(vehicle.id, vehicle.license_plate)}
-                                                className="text-red-600 hover:text-red-900 font-semibold"
-                                            >
-                                                Delete
-                                            </button>
+                            </thead>
+                            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                {vehicleList.length > 0 ? (
+                                    vehicleList.map((vehicle) => (
+                                        <tr key={vehicle.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 dark:text-white">
+                                                {vehicle.license_plate}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white font-medium">
+                                                {vehicle.model}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                                                <div className="font-medium text-gray-900 dark:text-white">{vehicle.customer?.name || 'N/A'}</div>
+                                                <div className="text-xs text-gray-500 dark:text-gray-400">{vehicle.customer?.phone}</div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                                                <div className="text-gray-900 dark:text-white">{vehicle.color || 'N/A'}</div>
+                                                <div className="text-xs text-gray-500 dark:text-gray-400">{vehicle.vin || 'No VIN'}</div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
+                                                <Link
+                                                    href={`/vehicles/${vehicle.id}/edit`}
+                                                    className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 font-semibold"
+                                                >
+                                                    Edit
+                                                </Link>
+                                                <button
+                                                    onClick={() => handleDelete(vehicle.id, vehicle.license_plate)}
+                                                    className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 font-semibold ml-4 cursor-pointer"
+                                                >
+                                                    Delete
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan={5} className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                                            No vehicles found. Click "+ Register New Vehicle" to get started.
                                         </td>
                                     </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
+        </AppLayout>
     );
 }

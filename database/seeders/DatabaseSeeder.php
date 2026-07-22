@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use App\Models\Part;
+use App\Models\User;
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
@@ -14,10 +14,21 @@ class DatabaseSeeder extends Seeder
     {
         // 1. Create Spatie Roles
         $adminRole = Role::firstOrCreate(['name' => 'Admin']);
-        $advisorRole = Role::firstOrCreate(['name' => 'Service Advisor']);
+        $managerRole = Role::firstOrCreate(['name' => 'Service Advisor']);
         $mechanicRole = Role::firstOrCreate(['name' => 'Mechanic']);
+        $customerRole = Role::firstOrCreate(['name' => 'Customer']);
 
-        // 2. Create Admin Account
+        // 2. Create/Assign Charith's Admin Account
+        $charith = User::firstOrCreate(
+            ['email' => 'Charithgayantha3@gmail.com'],
+            [
+                'name' => 'Charith Gayantha',
+                'password' => Hash::make('password123'),
+            ]
+        );
+        $charith->assignRole($adminRole);
+
+        // 3. Create Default System Admin Account
         $admin = User::firstOrCreate(
             ['email' => 'admin@system.com'],
             [
@@ -27,7 +38,7 @@ class DatabaseSeeder extends Seeder
         );
         $admin->assignRole($adminRole);
 
-        // 3. Create Service Advisor Account
+        // 4. Create Service Advisor Account
         $advisor = User::firstOrCreate(
             ['email' => 'advisor@system.com'],
             [
@@ -35,9 +46,9 @@ class DatabaseSeeder extends Seeder
                 'password' => Hash::make('password123'),
             ]
         );
-        $advisor->assignRole($advisorRole);
+        $advisor->assignRole($managerRole);
 
-        // 4. Seed Some Initial Parts Inventory
+        // 5. Seed Some Initial Parts Inventory
         Part::firstOrCreate(['sku' => 'OIL-SYN-01'], [
             'name' => 'Synthetic Engine Oil (4L)',
             'price' => 45.00,

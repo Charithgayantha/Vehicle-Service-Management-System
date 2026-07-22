@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AiServiceSummaryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InvoiceController;
@@ -7,7 +8,6 @@ use App\Http\Controllers\JobCardController;
 use App\Http\Controllers\MechanicController;
 use App\Http\Controllers\PartController;
 use App\Http\Controllers\VehicleController;
-use App\Http\Controllers\AiServiceSummaryController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -29,13 +29,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::post('/api/generate-summary', [AiServiceSummaryController::class, 'generate']);
 
-    // Vehicle Service Management Resource Routes
-    Route::resource('customers', CustomerController::class);
-    Route::resource('vehicles', VehicleController::class);
-    Route::resource('mechanics', MechanicController::class);
-    Route::resource('parts', PartController::class);
-    Route::resource('job-cards', JobCardController::class);
-    Route::resource('invoices', InvoiceController::class);
+    // Vehicle Service Management Resource Routes (Protected by Spatie Role Middleware)
+    Route::middleware(['role:Admin|Service Advisor|Mechanic'])->group(function () {
+        Route::resource('customers', CustomerController::class);
+        Route::resource('vehicles', VehicleController::class);
+        Route::resource('mechanics', MechanicController::class);
+        Route::resource('parts', PartController::class);
+        Route::resource('job-cards', JobCardController::class);
+        Route::resource('invoices', InvoiceController::class);
+    });
 });
 
 require __DIR__.'/settings.php';

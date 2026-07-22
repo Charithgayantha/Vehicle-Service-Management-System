@@ -28,12 +28,12 @@ export default function Index({ customers }: IndexProps) {
     };
 
     return (
-        <AppLayout>
+        <AppLayout >
             <Head title="Customers Management" />
 
             <div className="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header Section */}
-                <div className="flex justify-between items-center mb-6">
+                <div className="flex justify-between items-center mb-6 ">
                     <div>
                         <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Customers</h1>
                         <p className="text-sm text-gray-500 dark:text-gray-400">Manage your service center clients and contact details.</p>

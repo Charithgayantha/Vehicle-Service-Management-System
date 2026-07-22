@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\JobCard;
 use App\Models\Customer;
-use App\Models\Vehicle;
+use App\Models\JobCard;
 use App\Models\Mechanic;
+use App\Models\User;
+use App\Models\Vehicle;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -14,13 +16,26 @@ class JobCardController extends Controller
 {
     public function index(): Response
     {
+        $query = JobCard::with(['customer', 'vehicle', 'mechanic'])->latest();
+
+        /** @var User|null $user */
+        $user = auth()->user();
+
+        if ($user && $user->hasRole('Mechanic')) {
+            $query->whereHas('mechanic', function ($query) use ($user) {
+                $query->where('name', $user->name);
+            });
+        }
+
         return Inertia::render('JobCards/Index', [
-            'jobCards' => JobCard::with(['customer', 'vehicle', 'mechanic'])->latest()->get()
+            'jobCards' => $query->get(),
         ]);
     }
 
     public function create(): Response
     {
+        $this->ensureManageAccess();
+
         return Inertia::render('JobCards/Create', [
             'customers' => Customer::all(),
             'vehicles' => Vehicle::all(),
@@ -30,6 +45,8 @@ class JobCardController extends Controller
 
     public function store(Request $request)
     {
+        $this->ensureManageAccess();
+
         $validated = $request->validate([
             'customer_id' => 'required|exists:customers,id',
             'vehicle_id' => 'required|exists:vehicles,id',
@@ -39,21 +56,80 @@ class JobCardController extends Controller
             'problem_description' => 'required|string',
         ]);
 
-        // Auto-generate job number to satisfy your table schema requirement
-        $validated['job_number'] = 'JOB-' . strtoupper(uniqid());
+        $validated['job_number'] = 'JOB-'.strtoupper(uniqid());
 
-        // Prevent Double Booking for the same mechanic at the exact same scheduled time slot
         $existingBooking = JobCard::where('mechanic_id', $validated['mechanic_id'])
             ->where('scheduled_at', $validated['scheduled_at'])
             ->where('status', '!=', 'Cancelled')
             ->exists();
 
         if ($existingBooking) {
-            return back()->withErrors(['scheduled_at' => 'This mechanic is already booked for this exact date and time. Please choose another slot.']);
+            return back()->withErrors([
+                'scheduled_at' => 'This mechanic is already booked for this exact date and time. Please choose another slot.',
+            ]);
         }
 
         JobCard::create($validated);
 
         return redirect()->route('job-cards.index')->with('success', 'Service appointment booked successfully.');
+    }
+
+    public function show(JobCard $jobCard): Response
+    {
+        $this->ensureMechanicAccess($jobCard);
+
+        return Inertia::render('JobCards/Show', [
+            'jobCard' => $jobCard->load(['customer', 'vehicle', 'mechanic']),
+        ]);
+    }
+
+    public function edit(JobCard $jobCard): Response
+    {
+        $this->ensureMechanicAccess($jobCard);
+
+        return Inertia::render('JobCards/Edit', [
+            'jobCard' => $jobCard->load(['customer', 'vehicle', 'mechanic']),
+        ]);
+    }
+
+    public function update(Request $request, JobCard $jobCard)
+    {
+        $this->ensureMechanicAccess($jobCard);
+
+        $validated = $request->validate([
+            'status' => ['required', Rule::in(['Pending', 'In Progress', 'Completed', 'Cancelled'])],
+        ]);
+
+        $jobCard->update($validated);
+
+        return redirect()->route('job-cards.index')->with('success', 'Assigned job updated successfully.');
+    }
+
+    private function ensureMechanicAccess(JobCard $jobCard): void
+    {
+        /** @var User|null $user */
+        $user = auth()->user();
+
+        if ($user && ($user->hasRole('Admin') || $user->hasRole('Service Advisor'))) {
+            return;
+        }
+
+        abort_unless(
+            $user && $user->hasRole('Mechanic') && $jobCard->mechanic?->name === $user->name,
+            403,
+            'You can only view or update jobs assigned to you.'
+        );
+    }
+
+    private function ensureManageAccess(): void
+    {
+        /** @var User|null $user */
+        $user = auth()->user();
+
+        abort_unless(
+            $user && ($user->hasRole('Admin') || $user->hasRole('Service Advisor')),
+            403,
+            'Only admins and service advisors can create or assign job cards.'
+        );
     }
 }

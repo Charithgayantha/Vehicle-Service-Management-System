@@ -1,5 +1,5 @@
 import React from "react";
-import { Head, Link, router } from "@inertiajs/react";
+import { Head, Link, usePage } from "@inertiajs/react";
 import AppLayout from "@/layouts/app-layout";
 
 export interface JobCard {
@@ -19,6 +19,8 @@ interface IndexProps {
 
 export default function Index({ jobCards }: IndexProps) {
     const jobCardList = Array.isArray(jobCards) ? jobCards : (jobCards?.data || []);
+    const { auth } = usePage<{ auth: { user: { email: string } } }>().props;
+    const isMechanic = auth?.user?.email?.toLowerCase().includes('mechanic');
 
     const getStatusBadge = (status: string) => {
         switch (status) {
@@ -45,12 +47,14 @@ export default function Index({ jobCards }: IndexProps) {
                         <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Service Bookings & Job Cards</h1>
                         <p className="text-sm text-gray-500 dark:text-gray-400">Track service appointments, active repairs, and mechanic assignments.</p>
                     </div>
-                    <Link
-                        href="/job-cards/create"
-                        className="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150"
-                    >
-                        + New Service Booking
-                    </Link>
+                    {!isMechanic && (
+                        <Link
+                            href="/job-cards/create"
+                            className="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150"
+                        >
+                            + New Service Booking
+                        </Link>
+                    )}
                 </div>
 
                 <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg border border-gray-200 dark:border-gray-700">
@@ -64,6 +68,7 @@ export default function Index({ jobCards }: IndexProps) {
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Assigned Mechanic</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Scheduled Date</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -90,11 +95,19 @@ export default function Index({ jobCards }: IndexProps) {
                                                     {job.status}
                                                 </span>
                                             </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                                                <Link
+                                                    href={`/job-cards/${job.id}/edit`}
+                                                    className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-xs font-semibold text-white hover:bg-indigo-700"
+                                                >
+                                                    Update Status
+                                                </Link>
+                                            </td>
                                         </tr>
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan={6} className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                                        <td colSpan={7} className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
                                             No service bookings found. Click "+ New Service Booking" to create one.
                                         </td>
                                     </tr>
