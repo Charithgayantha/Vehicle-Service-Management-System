@@ -2,63 +2,77 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Part;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class PartController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $parts = Part::latest()->paginate(10);
+        return Inertia::render('Parts/Index', [
+            'parts' => $parts
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        return Inertia::render('Parts/Create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'sku' => 'required|string|max:255|unique:parts',
+            'stock_quantity' => 'required|integer|min:0',
+            'unit_price' => 'required|numeric|min:0',
+            'description' => 'nullable|string',
+        ]);
+
+        Part::create([
+            'name' => $validated['name'],
+            'sku' => $validated['sku'],
+            'stock_quantity' => $validated['stock_quantity'],
+            'price' => $validated['unit_price'],
+            'description' => $validated['description'] ?? null,
+        ]);
+
+        return redirect()->route('parts.index')->with('success', 'Part added successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function edit(Part $part)
     {
-        //
+        return Inertia::render('Parts/Edit', [
+            'part' => $part
+        ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function update(Request $request, Part $part)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'sku' => 'required|string|max:255|unique:parts,sku,' . $part->id,
+            'stock_quantity' => 'required|integer|min:0',
+            'unit_price' => 'required|numeric|min:0',
+            'description' => 'nullable|string',
+        ]);
+
+        $part->update([
+            'name' => $validated['name'],
+            'sku' => $validated['sku'],
+            'stock_quantity' => $validated['stock_quantity'],
+            'price' => $validated['unit_price'],
+            'description' => $validated['description'] ?? null,
+        ]);
+
+        return redirect()->route('parts.index')->with('success', 'Part updated successfully.');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function destroy(Part $part)
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $part->delete();
+        return redirect()->route('parts.index')->with('success', 'Part deleted successfully.');
     }
 }

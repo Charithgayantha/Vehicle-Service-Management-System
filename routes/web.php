@@ -7,6 +7,7 @@ use App\Http\Controllers\PartController;
 use App\Http\Controllers\JobCardController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\InvoiceController;
 
 
 Route::get('/', function () {
@@ -24,6 +25,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('mechanics', MechanicController::class);
     Route::resource('parts', PartController::class);
     Route::resource('job-cards', JobCardController::class);
+    Route::resource('invoices', InvoiceController::class);
 });
 
 require __DIR__.'/settings.php';

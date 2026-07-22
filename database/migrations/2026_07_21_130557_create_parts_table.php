@@ -9,19 +9,18 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+   public function up(): void
 {
     Schema::create('parts', function (Blueprint $table) {
         $table->id();
         $table->string('name');
-        $table->string('sku')->unique();
-        $table->decimal('price', 10, 2);
+        $table->string('part_number')->unique();
         $table->integer('stock_quantity')->default(0);
-        $table->integer('min_stock_level')->default(5);
+        $table->decimal('unit_price', 10, 2);
+        $table->text('description')->nullable();
         $table->timestamps();
     });
 }
-
     /**
      * Reverse the migrations.
      */
