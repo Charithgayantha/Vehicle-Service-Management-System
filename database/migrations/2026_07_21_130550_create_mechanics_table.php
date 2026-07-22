@@ -9,19 +9,17 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-   public function up(): void
+ public function up(): void
 {
     Schema::create('mechanics', function (Blueprint $table) {
         $table->id();
         $table->string('name');
-        $table->string('email')->unique();
-        $table->string('phone');
-        $table->string('specialization')->default('General Maintenance');
-        $table->string('status')->default('Available');
+        $table->string('employee_id')->unique();
+        $table->string('specialization');
+        $table->string('contact');
         $table->timestamps();
     });
 }
-
     /**
      * Reverse the migrations.
      */

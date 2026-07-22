@@ -2,63 +2,64 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Mechanic;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class MechanicController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): Response
     {
-        //
+        return Inertia::render('Mechanics/Index', [
+            'mechanics' => Mechanic::all()
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function create(): Response
     {
-        //
+        return Inertia::render('Mechanics/Create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'employee_id' => 'required|string|max:50|unique:mechanics,employee_id',
+            'specialization' => 'required|string|max:255',
+            'contact' => 'required|string|max:50',
+        ]);
+
+        Mechanic::create($validated);
+
+        return redirect()->route('mechanics.index')->with('success', 'Mechanic added successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function edit(Mechanic $mechanic): Response
     {
-        //
+        return Inertia::render('Mechanics/Edit', [
+            'mechanic' => $mechanic
+        ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function update(Request $request, Mechanic $mechanic)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'employee_id' => 'required|string|max:50|unique:mechanics,employee_id,' . $mechanic->id,
+            'specialization' => 'required|string|max:255',
+            'contact' => 'required|string|max:50',
+        ]);
+
+        $mechanic->update($validated);
+
+        return redirect()->route('mechanics.index')->with('success', 'Mechanic updated successfully.');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function destroy(Mechanic $mechanic)
     {
-        //
-    }
+        $mechanic->delete();
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return redirect()->route('mechanics.index')->with('success', 'Mechanic deleted successfully.');
     }
 }

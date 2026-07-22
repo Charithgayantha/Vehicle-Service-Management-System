@@ -9,10 +9,16 @@ class Mechanic extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'email', 'phone', 'specialization', 'status'];
+    protected $fillable = [
+        'name',
+        'employee_id',
+        'specialization',
+        'contact',
+    ];
 
-    public function jobCards()
+    // Optional: Relationship to service jobs if you plan to link them later
+    public function jobs()
     {
-        return $this->hasMany(JobCard::class);
+        return $this->hasMany(ServiceJob::class); // We will build this next!
     }
 }

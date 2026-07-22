@@ -9,21 +9,8 @@ class JobCard extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'job_number',
-        'customer_id',
-        'vehicle_id',
-        'mechanic_id',
-        'user_id',
-        'status',
-        'problem_description',
-        'ai_diagnosis',
-        'ai_estimated_cost',
-        'labor_cost',
-        'total_cost',
-        'scheduled_at',
-        'completed_at',
-    ];
+    // Disables mass-assignment restriction so all form fields save properly
+    protected $guarded = [];
 
     public function customer()
     {
@@ -40,13 +27,8 @@ class JobCard extends Model
         return $this->belongsTo(Mechanic::class);
     }
 
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
     public function parts()
     {
-        return $this->belongsToMany(Part::class)->withPivot('quantity', 'unit_price')->withTimestamps();
+        return $this->belongsToMany(Part::class, 'job_card_part')->withPivot('quantity', 'price');
     }
 }
