@@ -16,9 +16,9 @@ use App\Http\Controllers\RegisteredUserController;
 Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
 Route::post('/register', [RegisteredUserController::class, 'store']);
 
-// Home route
+// Home route - updated to load your custom welcome.blade.php view
 Route::get('/', function () {
-    return Inertia::render('welcome');
+    return view('welcome');
 })->name('home');
 
 // Authenticated Routes
