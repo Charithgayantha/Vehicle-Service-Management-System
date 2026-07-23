@@ -1,6 +1,6 @@
-import type { Auth } from '@/types';
-import AppLayout from '@/layouts/app-layout';
 import { Head, Link } from '@inertiajs/react';
+import AppLayout from '@/layouts/app-layout';
+import type { Auth } from '@/types';
 
 interface DashboardProps {
     auth: Auth;
@@ -23,7 +23,7 @@ interface DashboardProps {
     }>;
 }
 
-export default function MechanicDashboard({ auth, stats, lowStockItems, upcomingBookings }: DashboardProps) {
+export default function MechanicDashboard({ stats, lowStockItems, upcomingBookings }: DashboardProps) {
     return (
         <AppLayout>
             <Head title="Mechanic Dashboard" />

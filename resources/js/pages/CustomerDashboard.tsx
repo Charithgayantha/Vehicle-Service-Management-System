@@ -1,6 +1,6 @@
-import type { Auth } from '@/types';
-import AppLayout from '@/layouts/app-layout';
 import { Head } from '@inertiajs/react';
+import AppLayout from '@/layouts/app-layout';
+import type { Auth } from '@/types';
 
 interface DashboardProps {
     auth: Auth;
@@ -20,7 +20,7 @@ interface DashboardProps {
     }>;
 }
 
-export default function CustomerDashboard({ auth, customerVehicles, customerInvoices }: DashboardProps) {
+export default function CustomerDashboard({ customerVehicles, customerInvoices }: DashboardProps) {
     return (
         <AppLayout>
             <Head title="Customer Dashboard" />

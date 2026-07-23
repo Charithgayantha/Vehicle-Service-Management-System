@@ -1,6 +1,6 @@
-import type { Auth } from '@/types';
-import AppLayout from '@/layouts/app-layout';
 import { Head, Link } from '@inertiajs/react';
+import AppLayout from '@/layouts/app-layout';
+import type { Auth } from '@/types';
 
 interface DashboardProps {
     auth: Auth;
@@ -20,15 +20,15 @@ interface DashboardProps {
     }>;
 }
 
-export default function AdvisorDashboard({ auth, stats, upcomingBookings }: DashboardProps) {
+export default function AdvisorDashboard({ stats, upcomingBookings }: DashboardProps) {
     return (
         <AppLayout>
-            <Head title="Manager Dashboard" />
+            <Head title="Advisor Dashboard" />
 
             <div className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between gap-3">
                     <div>
-                        <h1 className="text-2xl font-semibold text">Manager Dashboard</h1>
+                        <h1 className="text-2xl font-semibold text-gray-900">Advisor Dashboard</h1>
                         <p className="text-sm text-gray-500">Create jobs, manage customers, and schedule repairs.</p>
                     </div>
                     <Link href="/job-cards/create" className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700">

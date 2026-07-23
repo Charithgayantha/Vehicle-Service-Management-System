@@ -10,6 +10,11 @@ use App\Http\Controllers\PartController;
 use App\Http\Controllers\VehicleController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\RegisteredUserController;
+
+// Fixed registration routes using the Route facade
+Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
+Route::post('/register', [RegisteredUserController::class, 'store']);
 
 // Home route
 Route::get('/', function () {

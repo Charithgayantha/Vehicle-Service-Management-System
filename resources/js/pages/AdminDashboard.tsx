@@ -1,6 +1,6 @@
-import type { Auth } from '@/types';
-import AppLayout from '@/layouts/app-layout';
 import { Head } from '@inertiajs/react';
+import AppLayout from '@/layouts/app-layout';
+import type { Auth } from '@/types';
 
 interface DashboardProps {
     auth: Auth;
@@ -26,14 +26,14 @@ interface DashboardProps {
     }>;
 }
 
-export default function AdminDashboard({ auth, stats, lowStockItems, recentInvoices }: DashboardProps) {
+export default function AdminDashboard({ stats, lowStockItems, recentInvoices }: DashboardProps) {
     return (
         <AppLayout>
             <Head title="Admin Dashboard" />
 
             <div className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
                 <div>
-                    <h1 className="text-2xl font-semibold -900">Admin Dashboard</h1>
+                    <h1 className="text-2xl font-semibold ">Admin Dashboard</h1>
                     <p className="text-sm text-gray-500">Full system metrics, user activity, and revenue overview.</p>
                 </div>
 
