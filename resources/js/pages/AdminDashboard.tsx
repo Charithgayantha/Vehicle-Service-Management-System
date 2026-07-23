@@ -108,7 +108,7 @@ export default function AdminDashboard({ stats, lowStockItems, recentInvoices }:
                                         <td className="px-3 py-2">{invoice.customer_name}</td>
                                         <td className="px-3 py-2">{invoice.vehicle_number}</td>
                                         <td className="px-3 py-2">{invoice.status}</td>
-                                        <td className="px-3 py-2">Rs. {invoice.total_amount.toFixed(2)}</td>
+                                        <td className="px-3 py-2">Rs. {Number(invoice.total_amount || 0).toFixed(2)}</td>
                                     </tr>
                                 ))}
                             </tbody>

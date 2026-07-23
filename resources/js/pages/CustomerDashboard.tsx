@@ -27,7 +27,7 @@ export default function CustomerDashboard({ customerVehicles, customerInvoices }
 
             <div className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
                 <div>
-                    <h1 className="text-2xl font-semibold text-gray-900">Customer Dashboard</h1>
+                    <h1 className="text-2xl font-semibold ">Customer Dashboard</h1>
                     <p className="text-sm text-gray-500">Track your service status and recent invoices.</p>
                 </div>
 

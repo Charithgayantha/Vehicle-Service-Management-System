@@ -18,12 +18,11 @@ const mainNavItems = [
 ];
 
 const navigationItems = [
-    // ... your existing navigation items (Dashboard, Job Cards, Inventory, etc.)
     {
         title: 'AI Service Summary',
-        url: '/AiServiceSummary', // Or use route('ai.service.summary') if using Ziggy
+        url: '/AiServiceSummary',
         icon: Sparkles,
-        isActive: window.location.pathname === '/AiServiceSummary',
+        isActive: typeof window !== 'undefined' && window.location.pathname === '/AiServiceSummary',
     },
 ];
 

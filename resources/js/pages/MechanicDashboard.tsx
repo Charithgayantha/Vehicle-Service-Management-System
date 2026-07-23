@@ -31,7 +31,7 @@ export default function MechanicDashboard({ stats, lowStockItems, upcomingBookin
             <div className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between gap-3">
                     <div>
-                        <h1 className="text-2xl font-semibold text-gray-900">Mechanic Dashboard</h1>
+                        <h1 className="text-2xl font-semibold ">Mechanic Dashboard</h1>
                         <p className="text-sm text-gray-500">Your active repair tasks and needed parts.</p>
                     </div>
                     <Link href="/job-cards" className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700">
@@ -42,15 +42,15 @@ export default function MechanicDashboard({ stats, lowStockItems, upcomingBookin
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                     <div className="rounded-lg border-l-4 border-blue-500 bg-white p-4 shadow-sm">
                         <div className="text-sm text-gray-500">Today&apos;s Bookings</div>
-                        <div className="mt-1 text-2xl font-semibold">{stats.todaysBookings}</div>
+                        <div className="mt-1 text-2xl font-semibold text-black">{stats.todaysBookings}</div>
                     </div>
                     <div className="rounded-lg border-l-4 border-yellow-500 bg-white p-4 shadow-sm">
                         <div className="text-sm text-gray-500">Active Jobs</div>
-                        <div className="mt-1 text-2xl font-semibold">{stats.activeJobs}</div>
+                        <div className="mt-1 text-2xl font-semibold text-black">{stats.activeJobs}</div>
                     </div>
                     <div className="rounded-lg border-l-4 border-green-500 bg-white p-4 shadow-sm">
                         <div className="text-sm text-gray-500">Daily Revenue</div>
-                        <div className="mt-1 text-2xl font-semibold">Rs. {stats.dailyRevenue.toFixed(2)}</div>
+                        <div className="mt-1 text-2xl font-semibold text-black">Rs. {stats.dailyRevenue.toFixed(2)}</div>
                     </div>
                 </div>
 
