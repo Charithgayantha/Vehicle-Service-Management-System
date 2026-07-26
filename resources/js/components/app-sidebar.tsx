@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react';
 import { BookOpen, FolderGit2, LayoutGrid, Users, Car, Wrench, Package, FileText, Receipt, Sparkles } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
+import ThemeToggle from '@/components/theme-toggle';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -74,8 +75,8 @@ const footerNavItems: NavItem[] = [
 
 export function AppSidebar() {
     return (
-        <Sidebar collapsible="icon" variant="inset" className="border-r border-zinc-800 bg-zinc-950">
-            <SidebarHeader className="border-b border-zinc-900 bg-zinc-950 py-3">
+        <Sidebar collapsible="icon" variant="inset" className="border-r border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+            <SidebarHeader className="border-b border-gray-200 dark:border-zinc-900 bg-white dark:bg-zinc-950 py-3">
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
@@ -87,12 +88,13 @@ export function AppSidebar() {
                 </SidebarMenu>
             </SidebarHeader>
 
-            <SidebarContent className="bg-zinc-950">
+            <SidebarContent className="bg-white dark:bg-zinc-950">
                 <NavMain items={mainNavItems} />
             </SidebarContent>
 
-            <SidebarFooter className="border-t border-zinc-900 bg-zinc-950">
-                <NavFooter items={footerNavItems} className="mt-auto" />
+            <SidebarFooter className="border-t border-gray-200 dark:border-zinc-900 bg-white dark:bg-zinc-950 px-2 py-2 space-y-1">
+                <ThemeToggle />
+                <NavFooter items={footerNavItems} />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

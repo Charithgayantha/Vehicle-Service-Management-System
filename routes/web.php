@@ -34,14 +34,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::post('/api/generate-summary', [AiServiceSummaryController::class, 'generate']);
 
-    // Vehicle Service Management Resource Routes (Protected by Spatie Role Middleware)
-    Route::middleware(['role:Admin|Service Advisor|Mechanic'])->group(function () {
+    // 1. Routes accessible by Staff AND Customers (Customers only see their own records via controller scoping)
+    Route::middleware(['role:Admin|Service Advisor|Mechanic|Customer'])->group(function () {
         Route::resource('customers', CustomerController::class);
         Route::resource('vehicles', VehicleController::class);
-        Route::resource('mechanics', MechanicController::class);
-        Route::resource('parts', PartController::class);
         Route::resource('job-cards', JobCardController::class);
         Route::resource('invoices', InvoiceController::class);
+    });
+
+    // 2. Strict Staff-Only Routes (Blocked for Customers - prevents access to parts and mechanics)
+    Route::middleware(['role:Admin|Service Advisor|Mechanic'])->group(function () {
+        Route::resource('mechanics', MechanicController::class);
+        Route::resource('parts', PartController::class);
     });
 });
 

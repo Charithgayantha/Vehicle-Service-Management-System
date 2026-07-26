@@ -11,16 +11,23 @@ class CustomerController extends Controller
     /**
      * Display a listing of the customers.
      */
-   public function index()
-{
-    // 1. Fetch all customers from the database, newest first
-    $customers = \App\Models\Customer::latest()->get();
+    public function index(Request $request)
+    {
+        $user = auth()->user();
 
-    // 2. Pass the fetched customers to your Inertia React component
-    return inertia('Customers/Index', [
-        'customers' => $customers
-    ]);
-}
+        // If the user is a customer, only fetch their own record
+        if ($user && $user->email && !$user->hasRole(['admin', 'advisor', 'mechanic'])) {
+            $customers = Customer::where('email', $user->email)->latest()->get();
+        } else {
+            // Staff and admins see all customers
+            $customers = Customer::latest()->get();
+        }
+
+        // Pass the fetched customers to your Inertia React component
+        return Inertia::render('Customers/Index', [
+            'customers' => $customers
+        ]);
+    }
 
     /**
      * Show the form for creating a new customer.
@@ -34,21 +41,21 @@ class CustomerController extends Controller
      * Store a newly created customer in database.
      */
     public function store(Request $request)
-{
-    // 1. Validate the incoming form data
-    $validated = $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|string|email|max:255|unique:customers,email',
-        'phone' => 'required|string|max:20',
-        'address' => 'nullable|string|max:500',
-    ]);
+    {
+        // 1. Validate the incoming form data
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:customers,email',
+            'phone' => 'required|string|max:20',
+            'address' => 'nullable|string|max:500',
+        ]);
 
-    // 2. Create the record in the database
-    \App\Models\Customer::create($validated);
+        // 2. Create the record in the database
+        Customer::create($validated);
 
-    // 3. MUST return a redirect for Inertia to navigate back!
-    return redirect()->route('customers.index');
-}
+        // 3. MUST return a redirect for Inertia to navigate back!
+        return redirect()->route('customers.index');
+    }
 
     /**
      * Display the specified customer and their vehicles.
