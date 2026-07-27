@@ -100,8 +100,9 @@ The database seeder automatically creates the following demo accounts (Password 
 | **Mechanic** | `mechanic@autotech.com` | `password123` | View Assigned Jobs, Update Job Status |
 | **Customer** | `customer@autotech.com` | `password123` | View Personal Vehicles & Invoices |
 
-📂 Project Structure Highlights
-Plaintext
+### 📂 Project Structure Highlights
+
+```text
 autotech-hub/
 ├── app/
 │   ├── Http/
