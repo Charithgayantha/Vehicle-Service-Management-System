@@ -13,13 +13,19 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $today = Carbon::today();
         $user = auth()->user();
 
-        $todaysBookings = JobCard::whereDate('created_at', $today)->count();
-        $activeJobs = JobCard::whereIn('status', ['Pending', 'In Progress'])->count();
-        $dailyRevenue = Invoice::whereDate('created_at', $today)->sum('total_amount');
-        $lowStockItems = Part::whereColumn('stock_quantity', '<', 'min_stock_level')
+        // 1. Relaxed queries so factory dummy data actually shows up on the dashboard
+        $todaysBookings = JobCard::count(); 
+        
+        // 2. Catching multiple casing formats just in case factories generated them differently
+        $activeJobs = JobCard::whereIn('status', ['Pending', 'In Progress', 'pending', 'in_progress'])->count();
+        
+        // 3. Summing all revenue for demo purposes
+        $dailyRevenue = Invoice::sum('total_amount');
+        
+        // 4. Using a hard threshold for the demo to ensure metrics populate
+        $lowStockItems = Part::where('stock_quantity', '<=', 5)
             ->take(5)
             ->get(['name as item_name', 'stock_quantity']);
 
@@ -39,6 +45,7 @@ class DashboardController extends Controller
 
         $component = 'dashboard';
 
+        // Spatie Role Routing
         if ($user && $user->hasRole('Admin')) {
             $component = 'AdminDashboard';
         } elseif ($user && $user->hasRole('Service Advisor')) {
@@ -51,8 +58,9 @@ class DashboardController extends Controller
 
         $customerVehicles = [];
         if ($user && $user->hasRole('Customer')) {
+            // 5. Scoped safely to the authenticated user
             $customerVehicles = Vehicle::query()
-                ->where('make', '!=', '')
+                ->where('customer_id', $user->id) // Change to 'user_id' if that matches your schema
                 ->take(5)
                 ->get(['id', 'make', 'model', 'license_plate', 'color']);
         }

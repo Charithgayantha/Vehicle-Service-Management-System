@@ -15,11 +15,11 @@ class CustomerController extends Controller
     {
         $user = auth()->user();
 
-        // If the user is a customer, only fetch their own record
-        if ($user && $user->email && !$user->hasRole(['admin', 'advisor', 'mechanic'])) {
+        // Safely check for the exact 'Customer' role based on your Spatie setup
+        if ($user && $user->hasRole('Customer')) {
             $customers = Customer::where('email', $user->email)->latest()->get();
         } else {
-            // Staff and admins see all customers
+            // Admins, Service Advisors, and Mechanics see all customers
             $customers = Customer::latest()->get();
         }
 

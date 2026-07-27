@@ -4,6 +4,10 @@ namespace Database\Seeders;
 
 use App\Models\Part;
 use App\Models\User;
+use App\Models\Customer;
+use App\Models\Vehicle;
+use App\Models\Mechanic;
+use App\Models\JobCard;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
@@ -69,5 +73,15 @@ class DatabaseSeeder extends Seeder
             'stock_quantity' => 8,
             'min_stock_level' => 2,
         ]);
+
+        // 6. Generate Dummy Data using Factories!
+        // This will bring your dashboard to life
+        Customer::factory(15)->create();
+        Mechanic::factory(6)->create();
+        Part::factory(25)->create(); 
+        
+        // Since VehicleFactory creates a customer, and JobCardFactory creates a Vehicle and Mechanic, 
+        // calling this alone will generate a great mix of relational data.
+        JobCard::factory(30)->create(); 
     }
 }
