@@ -90,13 +90,15 @@ npm run dev
 Visit the application at [http://127.0.0.1:8000](http://127.0.0.1:8000).
 
 🔑 Demo Access Credentials
-The database seeder automatically creates the following demo accounts (Password for all accounts is password):
 
-Role	      Email	                  Password	        Access Level
-Admin	      admin@autotech.com	    password123     	Full Access
-Manager	    manager@autotech.com  	password123     	CRUD Customers, Vehicles, Jobs, Invoices
-Mechanic	  mechanic@autotech.com  	password123	      View Assigned Jobs, Update Job Status
-Customer	  customer@autotech.com  	password123      	View Personal Vehicles & Invoices
+The database seeder automatically creates the following demo accounts (Password for all accounts is `password`):
+
+| Role | Email | Password | Access Level |
+| :--- | :--- | :--- | :--- |
+| **Admin** | `admin@autotech.com` | `password123` | Full Access |
+| **Manager** | `manager@autotech.com` | `password123` | CRUD Customers, Vehicles, Jobs, Invoices |
+| **Mechanic** | `mechanic@autotech.com` | `password123` | View Assigned Jobs, Update Job Status |
+| **Customer** | `customer@autotech.com` | `password123` | View Personal Vehicles & Invoices |
 
 📂 Project Structure Highlights
 Plaintext
