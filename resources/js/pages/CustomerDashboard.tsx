@@ -15,7 +15,7 @@ interface DashboardProps {
         id: number;
         invoice_number: string;
         vehicle_number: string;
-        total_amount: number;
+        total_amount: number | string;
         status: string;
     }>;
 }
@@ -59,7 +59,7 @@ export default function CustomerDashboard({ customerVehicles, customerInvoices }
                                             <span className="inline-block px-2.5 py-1 text-xs rounded-full bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20">{invoice.status}</span>
                                         </div>
                                         <div className="text-gray-500 dark:text-zinc-400 mt-1">Vehicle: {invoice.vehicle_number}</div>
-                                        <div className="mt-1 font-medium text-gray-900 dark:text-white">Rs. {invoice.total_amount.toFixed(2)}</div>
+                                        <div className="mt-1 font-medium text-gray-900 dark:text-white">Rs. {(typeof invoice.total_amount === 'number' ? invoice.total_amount : Number(invoice.total_amount || 0)).toFixed(2)}</div>
                                     </div>
                                 ))
                             ) : (

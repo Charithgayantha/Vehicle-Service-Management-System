@@ -57,12 +57,16 @@ class DashboardController extends Controller
         }
 
         $customerVehicles = [];
+        $customer = null;
         if ($user && $user->hasRole('Customer')) {
-            // 5. Scoped safely to the authenticated user
-            $customerVehicles = Vehicle::query()
-                ->where('customer_id', $user->id) // Change to 'user_id' if that matches your schema
-                ->take(5)
-                ->get(['id', 'make', 'model', 'license_plate', 'color']);
+            $customer = \App\Models\Customer::where('email', $user->email)->first();
+
+            if ($customer) {
+                $customerVehicles = Vehicle::query()
+                    ->where('customer_id', $customer->id)
+                    ->take(5)
+                    ->get(['id', 'make', 'model', 'license_plate', 'color']);
+            }
         }
 
         return Inertia::render($component, [
@@ -81,7 +85,7 @@ class DashboardController extends Controller
             'recentInvoices' => $recentInvoices,
             'upcomingBookings' => $upcomingBookings,
             'customerVehicles' => $customerVehicles,
-            'customerInvoices' => Invoice::where('customer_name', $user?->name ?? '')
+            'customerInvoices' => Invoice::where('customer_name', $customer?->name ?? $user?->name ?? '')
                 ->latest()
                 ->take(5)
                 ->get([

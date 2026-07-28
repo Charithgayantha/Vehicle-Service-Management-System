@@ -34,7 +34,7 @@ class DatabaseSeeder extends Seeder
 
         // 3. Create Default System Admin Account
         $admin = User::firstOrCreate(
-            ['email' => 'admin@system.com'],
+            ['email' => 'admin@gmail.com'],
             [
                 'name' => 'System Admin',
                 'password' => Hash::make('password123'),
