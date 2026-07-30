@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Head, Link, useForm } from "@inertiajs/react";
 import AppLayout from "@/layouts/app-layout";
 
@@ -20,21 +20,53 @@ interface Mechanic {
     specialization: string;
 }
 
+interface Part {
+    id: number;
+    name: string;
+    price: number;
+    stock_quantity: number;
+}
+
 interface CreateProps {
     customers: Customer[];
     vehicles: Vehicle[];
     mechanics: Mechanic[];
+    inventoryParts: Part[]; // Added inventory parts prop[cite: 5]
 }
 
-export default function Create({ customers, vehicles, mechanics }: CreateProps) {
+export default function Create({ customers, vehicles, mechanics, inventoryParts }: CreateProps) {
     const { data, setData, post, processing, errors } = useForm({
         customer_id: "",
         vehicle_id: "",
         mechanic_id: "",
-        scheduled_at: "", // Matches migration column
+        scheduled_at: "", 
         status: "Pending",
-        problem_description: "", // Matches migration column
+        problem_description: "", 
+        parts_used: [] as Array<{ id: number; name: string; quantity: number; unit_price: number }>, // Added array for parts[cite: 5]
     });
+
+    // Local state for part selection
+    const [selectedPartId, setSelectedPartId] = useState("");
+    const [partQuantity, setPartQuantity] = useState(1);
+
+    const handleAddPart = (e: React.MouseEvent) => {
+        e.preventDefault();
+        if (!selectedPartId) return;
+
+        const part = inventoryParts.find(p => p.id === parseInt(selectedPartId));
+        if (part) {
+            setData("parts_used", [
+                ...data.parts_used,
+                { id: part.id, name: part.name, quantity: partQuantity, unit_price: part.price }
+            ]);
+            setSelectedPartId("");
+            setPartQuantity(1);
+        }
+    };
+
+    const handleRemovePart = (indexToRemove: number) => {
+        setData("parts_used", data.parts_used.filter((_, index) => index !== indexToRemove));
+    };
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -170,6 +202,61 @@ export default function Create({ customers, vehicles, mechanics }: CreateProps) 
                                 required
                             />
                             {errors.problem_description && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.problem_description}</p>}
+                        </div>
+
+                        {/* --- NEW PARTS SECTION --- */}
+                        <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Required Parts</h3>
+                            
+                            <div className="flex gap-4 mb-4">
+                                <select 
+                                    value={selectedPartId} 
+                                    onChange={(e) => setSelectedPartId(e.target.value)}
+                                    className="flex-1 rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border"
+                                >
+                                    <option value="">Select a Part (Optional)</option>
+                                    {inventoryParts?.map(part => (
+                                        <option key={part.id} value={part.id}>
+                                            {part.name} (In Stock: {part.stock_quantity})
+                                        </option>
+                                    ))}
+                                </select>
+
+                                <input 
+                                    type="number" 
+                                    min="1"
+                                    value={partQuantity}
+                                    onChange={(e) => setPartQuantity(parseInt(e.target.value))}
+                                    className="w-24 rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border"
+                                />
+
+                                <button 
+                                    onClick={handleAddPart}
+                                    className="inline-flex justify-center px-4 py-2 text-sm font-semibold text-white bg-green-400 border border-transparent rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                                >
+                                    Add Part
+                                </button>
+                            </div>
+
+                            {/* Added Parts List */}
+                            {data.parts_used.length > 0 && (
+                                <ul className="mt-4 space-y-2">
+                                    {data.parts_used.map((item, index) => (
+                                        <li key={index} className="flex justify-between items-center bg-gray-50 dark:bg-gray-700 p-2 rounded-md border border-gray-200 dark:border-gray-600">
+                                            <span className="text-sm text-gray-700 dark:text-gray-300">
+                                                {item.quantity}x {item.name}
+                                            </span>
+                                            <button
+                                                type="button"
+                                                onClick={() => handleRemovePart(index)}
+                                                className="text-red-500 hover:text-red-700 text-sm font-medium"
+                                            >
+                                                Remove
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
                         </div>
 
                         {/* Submit Buttons */}

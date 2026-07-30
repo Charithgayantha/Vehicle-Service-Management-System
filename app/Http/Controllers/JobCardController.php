@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use App\Models\JobCard;
 use App\Models\Mechanic;
+use App\Models\Part; // Added Part model import
 use App\Models\User;
 use App\Models\Vehicle;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB; // Added DB facade for transactions
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -40,6 +42,8 @@ class JobCardController extends Controller
             'customers' => Customer::all(),
             'vehicles' => Vehicle::all(),
             'mechanics' => Mechanic::all(),
+            // Fetch parts that have stock available[cite: 4]
+            'inventoryParts' => Part::where('stock_quantity', '>', 0)->get(), 
         ]);
     }
 
@@ -54,6 +58,11 @@ class JobCardController extends Controller
             'scheduled_at' => 'required|date',
             'status' => 'required|in:Pending,In Progress,Completed,Cancelled',
             'problem_description' => 'required|string',
+            // New validation for parts array[cite: 4]
+            'parts_used' => 'nullable|array',
+            'parts_used.*.id' => 'required|exists:parts,id',
+            'parts_used.*.quantity' => 'required|integer|min:1',
+            'parts_used.*.unit_price' => 'required|numeric',
         ]);
 
         $validated['job_number'] = 'JOB-'.strtoupper(uniqid());
@@ -69,7 +78,21 @@ class JobCardController extends Controller
             ]);
         }
 
-        JobCard::create($validated);
+        // Wrap in transaction so if part saving fails, the job card isn't created orphaned[cite: 4]
+        DB::transaction(function () use ($validated) {
+            $jobCard = JobCard::create(collect($validated)->except('parts_used')->toArray());
+
+            if (!empty($validated['parts_used'])) {
+                $partsToAttach = [];
+                foreach ($validated['parts_used'] as $part) {
+                    $partsToAttach[$part['id']] = [
+                        'quantity' => $part['quantity'],
+                        'unit_price' => $part['unit_price'],
+                    ];
+                }
+                $jobCard->parts()->attach($partsToAttach);
+            }
+        });
 
         return redirect()->route('job-cards.index')->with('success', 'Service appointment booked successfully.');
     }
@@ -79,7 +102,7 @@ class JobCardController extends Controller
         $this->ensureMechanicAccess($jobCard);
 
         return Inertia::render('JobCards/Show', [
-            'jobCard' => $jobCard->load(['customer', 'vehicle', 'mechanic']),
+            'jobCard' => $jobCard->load(['customer', 'vehicle', 'mechanic', 'parts']),
         ]);
     }
 
@@ -88,7 +111,7 @@ class JobCardController extends Controller
         $this->ensureMechanicAccess($jobCard);
 
         return Inertia::render('JobCards/Edit', [
-            'jobCard' => $jobCard->load(['customer', 'vehicle', 'mechanic']),
+            'jobCard' => $jobCard->load(['customer', 'vehicle', 'mechanic', 'parts']),
         ]);
     }
 
@@ -100,7 +123,26 @@ class JobCardController extends Controller
             'status' => ['required', Rule::in(['Pending', 'In Progress', 'Completed', 'Cancelled'])],
         ]);
 
-        $jobCard->update($validated);
+        // Transaction block to safely deduct inventory[cite: 4]
+        DB::transaction(function () use ($validated, $jobCard) {
+            
+            // Check if status is transitioning to Completed
+            if ($validated['status'] === 'Completed' && $jobCard->status !== 'Completed') {
+                foreach ($jobCard->parts as $part) {
+                    $quantityUsed = $part->pivot->quantity;
+                    $inventoryPart = Part::find($part->id);
+                    
+                    // Deduct from stock_quantity column[cite: 3]
+                    if ($inventoryPart && $inventoryPart->stock_quantity >= $quantityUsed) {
+                        $inventoryPart->decrement('stock_quantity', $quantityUsed);
+                    } else {
+                        throw new \Exception("Not enough stock for {$part->name}");
+                    }
+                }
+            }
+            
+            $jobCard->update($validated);
+        });
 
         return redirect()->route('job-cards.index')->with('success', 'Assigned job updated successfully.');
     }

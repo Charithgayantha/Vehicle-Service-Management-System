@@ -29,6 +29,7 @@ class JobCard extends Model
 
     public function parts()
     {
-        return $this->belongsToMany(Part::class, 'job_card_part')->withPivot('quantity', 'price');
+        // Updated 'price' to 'unit_price' to match the migration[cite: 1, 2]
+        return $this->belongsToMany(Part::class, 'job_card_part')->withPivot('quantity', 'unit_price'); 
     }
 }
